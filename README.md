@@ -173,3 +173,22 @@ Running the Scripts
 Do not start the modeling script immediately after the MSA script
 Ensure that some MSA jobs have completed before launching prediction jobs
 Monitor log files (*.log) to track progress 
+
+
+## **8. Faster Large-Scale Screens (recommended for many pairs)**
+
+For large screens (e.g. one protein against a proteome), the folder **fast_screen/** contains a faster workflow. It uses the same input CSV, and its outputs work with AF3_analysis.py.
+
+- MSAs are computed **once per unique protein** instead of once per pair, with 8 MSA processes side by side on one CPU node
+- The pair inputs are assembled from these per-protein MSAs (identical to the per-pair inputs above)
+- Many pairs are predicted in **one GPU job**, with **1 diffusion sample** instead of 5 (rerun hits with 5)
+
+In a 10-pair benchmark, extrapolated to a ~7,400-pair screen:
+
+| | standard (sections 6–7) | fast_screen |
+|---|---:|---:|
+| MSA CPU core-h | ~158,000 | ~51,000 (3.1x less) |
+| GPU-h | ~310 | ~183 (1.7x less) |
+| SLURM jobs | ~14,800 | ~106 |
+
+The ipTM of the true interaction was unchanged (0.81 vs 0.80). See [fast_screen/README.md](fast_screen/README.md) for the full benchmark, step-by-step instructions and caveats.
